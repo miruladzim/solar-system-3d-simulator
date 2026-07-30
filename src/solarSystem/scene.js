@@ -193,14 +193,14 @@ export class SolarSystemScene {
     const ry = dy * cy - rz1 * sy;
     const rz = dy * sy + rz1 * cy;
 
-    if (rz >= 0) return null; // Behind camera
+    if (rz <= 5) return null; // Behind camera or too close to lens
 
     const fovScale = (this.canvas.height / 2) / Math.tan((this.cam.fov * Math.PI / 180) / 2);
-    const screenX = (rx * fovScale) / -rz + this.canvas.width / 2;
-    const screenY = (ry * fovScale) / -rz + this.canvas.height / 2;
-    const scale = fovScale / -rz;
+    const screenX = (rx * fovScale) / rz + this.canvas.width / 2;
+    const screenY = (-ry * fovScale) / rz + this.canvas.height / 2;
+    const scale = fovScale / rz;
 
-    return { x: screenX, y: screenY, depth: -rz, scale: scale };
+    return { x: screenX, y: screenY, depth: rz, scale: scale };
   }
 
   animate() {
@@ -480,9 +480,13 @@ export class SolarSystemScene {
     this.isFollowMode = false;
     this.isCinematicTour = false;
 
+    this.cameraAngles.theta = Math.PI / 2;
+    this.cameraAngles.phi = 0.35;
+    this.cameraAngles.distance = 260;
+
     this.camAnim.startCam = { x: this.cam.x, y: this.cam.y, z: this.cam.z };
     this.camAnim.startTarget = { x: this.cam.targetX, y: this.cam.targetY, z: this.cam.targetZ };
-    this.camAnim.targetCam = { x: 0, y: 110, z: 240 };
+    this.camAnim.targetCam = { x: 0, y: 90, z: 240 };
     this.camAnim.targetTarget = { x: 0, y: 0, z: 0 };
     this.camAnim.progress = 0;
     this.camAnim.isAnimating = true;
