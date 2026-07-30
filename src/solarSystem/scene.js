@@ -457,6 +457,60 @@ export class SolarSystemScene {
         ctx.beginPath();
         ctx.arc(0, 0, r * 1.35, 0, Math.PI * 2);
         ctx.fill();
+      } else {
+        // All Other Planets (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto)
+        const pGrad = ctx.createRadialGradient(-r * 0.35, -r * 0.35, r * 0.05, 0, 0, r * 1.15);
+        pGrad.addColorStop(0.0, '#ffffff');
+        pGrad.addColorStop(0.25, data.color);
+        pGrad.addColorStop(0.8, data.color);
+        pGrad.addColorStop(1.0, '#04060f');
+
+        ctx.fillStyle = pGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Planet Surface & Atmospheric Overlays
+        if (id === 'jupiter' || id === 'saturn') {
+          // Gas Giant Bands & Great Red Spot
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(0, 0, r, 0, Math.PI * 2);
+          ctx.clip();
+
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
+          ctx.fillRect(-r, -r * 0.4, r * 2, r * 0.25);
+          ctx.fillRect(-r, r * 0.15, r * 2, r * 0.2);
+
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+          ctx.fillRect(-r, -r * 0.1, r * 2, r * 0.18);
+
+          if (id === 'jupiter') {
+            // Great Red Spot
+            ctx.fillStyle = '#cc3300';
+            ctx.beginPath();
+            ctx.ellipse(r * 0.3, r * 0.25, r * 0.25, r * 0.15, 0, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          ctx.restore();
+        } else if (id === 'mars') {
+          // Mars Polar Cap & Canyon Shadows
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(0, 0, r, 0, Math.PI * 2);
+          ctx.clip();
+
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+          ctx.beginPath();
+          ctx.arc(0, -r * 0.85, r * 0.35, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = 'rgba(60, 20, 10, 0.25)';
+          ctx.fillRect(-r * 0.5, r * 0.1, r, r * 0.2);
+
+          ctx.restore();
+        }
       }
 
       // Selection & Hover Ring
