@@ -92,6 +92,23 @@ export class SolarSystemScene {
       });
     }
 
+    // Initialize 1,200 Asteroid Belt Particles (Orbiting between Mars and Jupiter at radius 92..118)
+    this.asteroids = [];
+    const asteroidColors = ['#8a817c', '#bcb8b1', '#706660', '#a39b8b', '#d6ccc2'];
+    for (let i = 0; i < 1200; i++) {
+      const radius = 92 + Math.random() * 26;
+      const angle = Math.random() * Math.PI * 2;
+      const speed = (0.015 + Math.random() * 0.02) * (Math.random() > 0.5 ? 1 : 1.1);
+      this.asteroids.push({
+        radius: radius,
+        angle: angle,
+        y: (Math.random() - 0.5) * 8.5,
+        speed: speed,
+        size: Math.random() * 1.5 + 0.8,
+        color: asteroidColors[Math.floor(Math.random() * asteroidColors.length)]
+      });
+    }
+
     this.bindEvents();
     this.animate();
   }
@@ -226,6 +243,13 @@ export class SolarSystemScene {
         }
         p.rotation += p.data.rotationSpeed * 0.2 * this.timeSpeed;
       });
+
+      // Orbit Asteroids
+      if (this.asteroids) {
+        this.asteroids.forEach(a => {
+          a.angle += a.speed * 0.08 * this.timeSpeed;
+        });
+      }
     }
 
     // Cinematic Tour Switcher
@@ -278,6 +302,23 @@ export class SolarSystemScene {
           }
         }
         ctx.stroke();
+      });
+      ctx.globalAlpha = 1.0;
+    }
+
+    // 3. Render 1,200 Orbiting Asteroids (Asteroid Belt)
+    if (this.asteroids) {
+      this.asteroids.forEach(a => {
+        const ax = Math.cos(a.angle) * a.radius;
+        const az = Math.sin(a.angle) * a.radius;
+        const proj = this.project3D(ax, a.y, az);
+        if (proj && proj.x >= 0 && proj.x <= width && proj.y >= 0 && proj.y <= height) {
+          ctx.fillStyle = a.color;
+          ctx.globalAlpha = 0.8;
+          ctx.beginPath();
+          ctx.arc(proj.x, proj.y, Math.max(0.6, a.size * proj.scale * 0.4), 0, Math.PI * 2);
+          ctx.fill();
+        }
       });
       ctx.globalAlpha = 1.0;
     }
