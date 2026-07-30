@@ -305,66 +305,79 @@ export class SolarSystemScene {
       const data = state.data;
       const isSelected = this.selectedPlanetId === id;
       const isHovered = this.hoveredPlanetId === id;
+      const r = Math.max(3, radius);
 
       ctx.save();
       ctx.translate(proj.x, proj.y);
 
-      // SUN Glow Atmosphere
-      if (id === 'sun') {
-        const grad = ctx.createRadialGradient(0, 0, radius * 0.5, 0, 0, radius * 2.2);
-        grad.addColorStop(0, 'rgba(255, 230, 120, 1.0)');
-        grad.addColorStop(0.4, 'rgba(255, 140, 0, 0.7)');
-        grad.addColorStop(1, 'rgba(255, 60, 0, 0.0)');
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(0, 0, radius * 2.2, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
       // Saturn Rings
       if (id === 'saturn' && data.hasRings) {
         ctx.save();
-        ctx.scale(1, 0.35);
-        ctx.strokeStyle = 'rgba(230, 200, 150, 0.7)';
-        ctx.lineWidth = radius * 0.8;
+        ctx.scale(1, 0.3);
+        const ringGrad = ctx.createRadialGradient(0, 0, r * 1.3, 0, 0, r * 2.5);
+        ringGrad.addColorStop(0, 'rgba(210, 180, 140, 0.0)');
+        ringGrad.addColorStop(0.3, 'rgba(230, 200, 150, 0.7)');
+        ringGrad.addColorStop(0.7, 'rgba(200, 170, 120, 0.8)');
+        ringGrad.addColorStop(1, 'rgba(180, 150, 100, 0.0)');
+        ctx.fillStyle = ringGrad;
         ctx.beginPath();
-        ctx.arc(0, 0, radius * 1.8, 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.arc(0, 0, r * 2.5, 0, Math.PI * 2);
+        ctx.fill();
         ctx.restore();
       }
 
-      // Planet Sphere Body
-      ctx.beginPath();
-      ctx.arc(0, 0, Math.max(2, radius), 0, Math.PI * 2);
-
-      // Procedural Canvas Texture Map or Shaded Sphere Gradient
-      const textureCanvas = this.textures[id];
-      if (textureCanvas) {
-        ctx.clip();
-        ctx.drawImage(textureCanvas, -radius, -radius, radius * 2, radius * 2);
-      } else {
-        ctx.fillStyle = data.color;
-        ctx.fill();
-      }
-
-      // Photorealistic Spherical Lighting Overlay
-      if (id !== 'sun') {
-        const lightGrad = ctx.createRadialGradient(-radius * 0.35, -radius * 0.35, radius * 0.1, 0, 0, radius * 1.1);
-        lightGrad.addColorStop(0, 'rgba(255, 255, 255, 0.35)');
-        lightGrad.addColorStop(0.6, 'rgba(0, 0, 0, 0.1)');
-        lightGrad.addColorStop(1, 'rgba(0, 0, 0, 0.85)');
-        ctx.fillStyle = lightGrad;
+      if (id === 'sun') {
+        // Sun Core & Plasma Flare
+        const sunGrad = ctx.createRadialGradient(0, 0, r * 0.1, 0, 0, r);
+        sunGrad.addColorStop(0, '#ffffff');
+        sunGrad.addColorStop(0.25, '#fff066');
+        sunGrad.addColorStop(0.65, '#ffaa00');
+        sunGrad.addColorStop(1, '#ff3300');
+        ctx.fillStyle = sunGrad;
         ctx.beginPath();
-        ctx.arc(0, 0, Math.max(2, radius), 0, Math.PI * 2);
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
         ctx.fill();
+
+        // Sun Corona Halo
+        const flareGrad = ctx.createRadialGradient(0, 0, r * 0.8, 0, 0, r * 2.2);
+        flareGrad.addColorStop(0, 'rgba(255, 170, 0, 0.6)');
+        flareGrad.addColorStop(0.5, 'rgba(255, 80, 0, 0.25)');
+        flareGrad.addColorStop(1, 'rgba(255, 30, 0, 0.0)');
+        ctx.fillStyle = flareGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, r * 2.2, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // 3D Planet Sphere Body with Dynamic Specular Light
+        const pGrad = ctx.createRadialGradient(-r * 0.35, -r * 0.35, r * 0.05, 0, 0, r * 1.1);
+        pGrad.addColorStop(0.0, '#ffffff');
+        pGrad.addColorStop(0.25, data.color);
+        pGrad.addColorStop(0.75, data.color);
+        pGrad.addColorStop(1.0, '#04060f');
+
+        ctx.fillStyle = pGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Earth Volumetric Atmosphere Halo
+        if (id === 'earth') {
+          const atmoGrad = ctx.createRadialGradient(0, 0, r * 0.95, 0, 0, r * 1.35);
+          atmoGrad.addColorStop(0, 'rgba(0, 210, 255, 0.5)');
+          atmoGrad.addColorStop(1, 'rgba(0, 210, 255, 0.0)');
+          ctx.fillStyle = atmoGrad;
+          ctx.beginPath();
+          ctx.arc(0, 0, r * 1.35, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
 
-      // Selection Halo Ring
+      // Selection & Hover Ring
       if (isSelected || isHovered) {
-        ctx.strokeStyle = isSelected ? '#00f0ff' : 'rgba(255, 255, 255, 0.7)';
+        ctx.strokeStyle = isSelected ? '#00f0ff' : 'rgba(255, 255, 255, 0.8)';
         ctx.lineWidth = isSelected ? 3 : 1.5;
         ctx.beginPath();
-        ctx.arc(0, 0, radius + 6, 0, Math.PI * 2);
+        ctx.arc(0, 0, r + 6, 0, Math.PI * 2);
         ctx.stroke();
       }
 
