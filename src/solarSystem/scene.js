@@ -388,29 +388,75 @@ export class SolarSystemScene {
         ctx.beginPath();
         ctx.arc(0, 0, r * 2.2, 0, Math.PI * 2);
         ctx.fill();
-      } else {
-        // 3D Planet Sphere Body with Dynamic Specular Light
-        const pGrad = ctx.createRadialGradient(-r * 0.35, -r * 0.35, r * 0.05, 0, 0, r * 1.1);
-        pGrad.addColorStop(0.0, '#ffffff');
-        pGrad.addColorStop(0.25, data.color);
-        pGrad.addColorStop(0.75, data.color);
-        pGrad.addColorStop(1.0, '#04060f');
-
-        ctx.fillStyle = pGrad;
+      } else if (id === 'earth') {
+        // 1. Ocean Base Sphere
+        const oceanGrad = ctx.createRadialGradient(-r * 0.35, -r * 0.35, r * 0.05, 0, 0, r * 1.1);
+        oceanGrad.addColorStop(0.0, '#48cae4');
+        oceanGrad.addColorStop(0.3, '#0077b6');
+        oceanGrad.addColorStop(0.8, '#023e8a');
+        oceanGrad.addColorStop(1.0, '#001233');
+        ctx.fillStyle = oceanGrad;
         ctx.beginPath();
         ctx.arc(0, 0, r, 0, Math.PI * 2);
         ctx.fill();
 
-        // Earth Volumetric Atmosphere Halo
-        if (id === 'earth') {
-          const atmoGrad = ctx.createRadialGradient(0, 0, r * 0.95, 0, 0, r * 1.35);
-          atmoGrad.addColorStop(0, 'rgba(0, 210, 255, 0.5)');
-          atmoGrad.addColorStop(1, 'rgba(0, 210, 255, 0.0)');
-          ctx.fillStyle = atmoGrad;
-          ctx.beginPath();
-          ctx.arc(0, 0, r * 1.35, 0, Math.PI * 2);
-          ctx.fill();
-        }
+        // 2. Lush Green Continents & Landmasses
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.clip();
+
+        // Green Continent Land Patterns (Forest & grassland green)
+        ctx.fillStyle = '#2e7d32';
+        ctx.beginPath();
+        ctx.arc(-r * 0.3, -r * 0.2, r * 0.45, 0, Math.PI * 2);
+        ctx.arc(r * 0.25, -r * 0.25, r * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#388e3c';
+        ctx.beginPath();
+        ctx.arc(-r * 0.2, r * 0.3, r * 0.38, 0, Math.PI * 2);
+        ctx.arc(r * 0.3, r * 0.2, r * 0.42, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#4caf50';
+        ctx.beginPath();
+        ctx.arc(r * 0.5, r * 0.4, r * 0.25, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Snow White Polar Ice Caps
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.beginPath();
+        ctx.arc(0, -r * 0.85, r * 0.4, 0, Math.PI * 2);
+        ctx.arc(0, r * 0.85, r * 0.45, 0, Math.PI * 2);
+        ctx.fill();
+
+        // White Atmosphere Cloud Swirls
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+        ctx.beginPath();
+        ctx.arc(-r * 0.1, -r * 0.3, r * 0.7, 0.2, Math.PI * 0.8);
+        ctx.fill();
+
+        ctx.restore();
+
+        // 3D Spherical Light & Shadow Overlay
+        const lightGrad = ctx.createRadialGradient(-r * 0.35, -r * 0.35, r * 0.1, 0, 0, r * 1.15);
+        lightGrad.addColorStop(0, 'rgba(255, 255, 255, 0.35)');
+        lightGrad.addColorStop(0.5, 'rgba(0, 0, 0, 0.0)');
+        lightGrad.addColorStop(1, 'rgba(0, 10, 30, 0.85)');
+        ctx.fillStyle = lightGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Volumetric Atmosphere Glow Halo
+        const atmoGrad = ctx.createRadialGradient(0, 0, r * 0.95, 0, 0, r * 1.35);
+        atmoGrad.addColorStop(0, 'rgba(0, 210, 255, 0.55)');
+        atmoGrad.addColorStop(1, 'rgba(0, 210, 255, 0.0)');
+        ctx.fillStyle = atmoGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, r * 1.35, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       // Selection & Hover Ring
